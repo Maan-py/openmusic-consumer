@@ -5,6 +5,7 @@ class MailSender {
     this.transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
+      secure: false,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
@@ -12,18 +13,21 @@ class MailSender {
     });
   }
 
-  sendEmail(targetEmail, content) {
+  async sendEmail(targetEmail, content) {
     const message = {
-      from: 'OpenMusicAPIv3',
+      from: process.env.SMTP_USER,
       to: targetEmail,
-      subject: 'Export Playlist',
-      text: 'Terlampir hasil dari export playlist',
-      attachments: {
-        filename: 'playlist.json',
-        content,
-      },
+      subject: 'Ekspor Playlist',
+      text: 'Terlampir hasil ekspor playlist dalam format JSON.',
+      attachments: [
+        {
+          filename: 'playlist.json',
+          content,
+        },
+      ],
     };
-    return this.transporter.sendMail(message);
+
+    await this.transporter.sendMail(message);
   }
 }
 
